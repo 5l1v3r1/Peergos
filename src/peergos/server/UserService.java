@@ -3,6 +3,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.logging.Logger;
 
+import peergos.server.messages.*;
 import peergos.server.storage.admin.*;
 import peergos.server.util.Logging;
 import java.util.logging.Level;
@@ -81,6 +82,7 @@ public class UserService {
     public final MutablePointers mutable;
     public final InstanceAdmin controller;
     public final SpaceUsage usage;
+    public final ServerMessageStore serverMessages;
 
     public UserService(ContentAddressedStorage storage,
                        Crypto crypto,
@@ -88,7 +90,8 @@ public class UserService {
                        SocialNetwork social,
                        MutablePointers mutable,
                        InstanceAdmin controller,
-                       SpaceUsage usage) {
+                       SpaceUsage usage,
+                       ServerMessageStore serverMessages) {
         this.storage = storage;
         this.crypto = crypto;
         this.coreNode = coreNode;
@@ -96,6 +99,7 @@ public class UserService {
         this.mutable = mutable;
         this.controller = controller;
         this.usage = usage;
+        this.serverMessages = serverMessages;
     }
 
     public static class TlsProperties {
@@ -217,6 +221,8 @@ public class UserService {
                 new AdminHandler(this.controller, isPublicServer));
         addHandler.accept("/" + Constants.SPACE_USAGE_URL,
                 new SpaceHandler(this.usage, isPublicServer));
+        addHandler.accept("/" + Constants.SERVER_MESSAGE_URL,
+                new ServerMessageHandler(this.serverMessages, coreNode, storage, isPublicServer));
         addHandler.accept("/" + Constants.PUBLIC_FILES_URL, new PublicFileHandler(coreNode, mutable, storage));
         addHandler.accept(UI_URL, handler);
 

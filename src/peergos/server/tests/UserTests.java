@@ -1367,6 +1367,9 @@ public abstract class UserTests {
         ServerMessage reply = withReply.get(2);
         Assert.assertTrue(reply.contents.equals(replyBody));
 
+        List<ServerConversation> convs = context.getServerConversations().join();
+        Assert.assertTrue(convs.size() == 2);
+
         context.dismissMessage(fromServer).join();
         List<ServerMessage> updatedMessages = context.getNewMessages().join();
         Assert.assertTrue(updatedMessages.size() == 2);
